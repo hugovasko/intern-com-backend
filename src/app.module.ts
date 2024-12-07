@@ -27,6 +27,7 @@ import { UsersModule } from './users/users.module';
       }),
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([User, Opportunity]),
     AuthModule,
     OpportunitiesModule,
     UsersModule,
