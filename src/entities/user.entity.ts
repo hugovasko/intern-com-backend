@@ -49,4 +49,16 @@ export class User {
 
   @OneToMany(() => Opportunity, (opportunity) => opportunity.company)
   opportunities: Opportunity[];
+
+  @Column({ type: 'bytea', nullable: true })
+  cv: Buffer;
+
+  @Column({ nullable: true })
+  cvFileName: string;
+
+  @Column({ nullable: true })
+  cvMimeType: string;
+
+  @Column({ nullable: true })
+  cvUploadedAt: Date;
 }
