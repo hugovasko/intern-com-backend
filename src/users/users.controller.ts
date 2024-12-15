@@ -49,7 +49,6 @@ export class UsersController {
   // User profile management routes
   @Get('me')
   async getCurrentUser(@Req() req) {
-    console.log(req.user);
     return this.usersService.findOne(req.user.id);
   }
 
