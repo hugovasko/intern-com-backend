@@ -62,4 +62,3 @@ export class User {
   @Column({ nullable: true })
   cvUploadedAt: Date;
 }
-
