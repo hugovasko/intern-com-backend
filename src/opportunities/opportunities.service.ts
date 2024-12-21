@@ -15,21 +15,42 @@ export class OpportunitiesService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-
-  async findAll(): Promise<Opportunity[]> {
-    return this.opportunityRepository.find({
-      relations: ['company'],
-      select: {
-        company: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-          companyName: true,
-        },
-      },
-    });
+  
+  async findAll(field?: string): Promise<Opportunity[]> {
+    const queryBuilder = this.opportunityRepository
+    .createQueryBuilder('opportunity')
+    .leftJoinAndSelect('opportunity.company', 'company')
+    .select([
+      'opportunity',
+      'company.id',
+      'company.firstName',
+      'company.lastName',
+      'company.email',
+      'company.companyName',
+    ]);
+    
+    if (field) {
+      queryBuilder.where('opportunity.field = :field', { field });
+    }
+    
+    return queryBuilder.getMany();
   }
+  
+  // ***LEAVING THE OLD FINDALL() IN CASE WE DECIDE TO FILTER THE OPPORTUNITIES ONLY FROM THE FRONTEND***
+  //  async findAll(): Promise<Opportunity[]> {
+  //    return this.opportunityRepository.find({
+  //      relations: ['company'],
+  //      select: {
+  //       company: {
+  //          id: true,
+  //          firstName: true,
+  //          lastName: true,
+  //          email: true,
+  //          companyName: true,
+  //        },
+  //      },
+  //    });
+  //  }
 
   async findOne(id: number): Promise<Opportunity> {
     const opportunity = await this.opportunityRepository.findOne({

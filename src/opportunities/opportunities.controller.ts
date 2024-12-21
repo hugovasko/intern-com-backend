@@ -9,6 +9,7 @@ import {
   Param,
   UseGuards,
   Request,
+  Query,
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,6 +20,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
+import { query } from 'express';
+//import { Query } from 'typeorm/driver/Query';
 
 @Controller('opportunities')
 export class OpportunitiesController {
@@ -32,9 +35,15 @@ export class OpportunitiesController {
   }
 
   @Get()
-  async findAll() {
-    return this.opportunitiesService.findAll();
+  async findAll(@Query('field') field?: string) {
+    return this.opportunitiesService.findAll(field);
   }
+
+  // LEFT THIS HERE IN CASE WE DECIDE TO PROCEED WITH FILTERING IN THE FRONTEND ONLY
+  //@Get()
+  //async findAll() {
+  //  return this.opportunitiesService.findAll();
+  //}
 
   @Get(':id')
   async findOne(@Param('id') id: string) {

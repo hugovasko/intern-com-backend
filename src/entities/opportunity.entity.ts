@@ -28,6 +28,9 @@ export class Opportunity {
   @Column()
   type: string; // e.g., 'internship', 'full-time', etc.
 
+  @Column()
+  field: string; // design, engineering, marketing
+
   @CreateDateColumn()
   createdAt: Date;
 

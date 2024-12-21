@@ -25,4 +25,8 @@ export class CreateOpportunityDto {
   @IsOptional()
   @IsNumber()
   partnerId?: number;
+
+  @IsNotEmpty()
+  @IsString()
+  field: string; 
 }
