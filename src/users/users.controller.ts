@@ -19,6 +19,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
 import { CvUploadDto } from './dto/cv-upload.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -93,5 +94,11 @@ export class UsersController {
       throw new ForbiddenException('You can only remove your own CV');
     }
     return this.usersService.removeCv(+id);
+  }
+
+  @Public()
+  @Get('all-partnes-coordinates')
+  getAllPartnersCoordinates() {
+    return this.usersService.getAllPartnersCoordinates();
   }
 }

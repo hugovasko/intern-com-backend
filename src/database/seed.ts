@@ -39,6 +39,15 @@ async function bootstrap() {
     role: UserRole.ADMIN,
   });
 
+  // Bulgarian cities coordinates
+  const bulgarianLocations = [
+    { city: 'Sofia', coordinates: '42.697839,23.321670' },
+    { city: 'Plovdiv', coordinates: '42.144920,24.748220' },
+    { city: 'Varna', coordinates: '43.214050,27.914733' },
+    { city: 'Burgas', coordinates: '42.510578,27.461014' },
+    { city: 'Ruse', coordinates: '43.856258,25.974375' },
+  ];
+
   // Create partner users
   const partners = [];
   for (let i = 1; i <= 5; i++) {
@@ -50,6 +59,7 @@ async function bootstrap() {
         password: hashedPassword,
         role: UserRole.PARTNER,
         companyName: `Company ${i}`,
+        companyCoordinates: bulgarianLocations[i - 1].coordinates,
       }),
     );
   }
@@ -71,9 +81,10 @@ async function bootstrap() {
       await opportunityRepository.save({
         title: `${partner.companyName} Opportunity ${i}`,
         description: `This is a great opportunity at ${partner.companyName}.`,
-        location: ['New York', 'London', 'Berlin', 'Paris', 'Tokyo'][
-          Math.floor(Math.random() * 5)
-        ],
+        location:
+          bulgarianLocations[
+            Math.floor(Math.random() * bulgarianLocations.length)
+          ].city,
         salary: `${Math.floor(Math.random() * 50) + 50}k - ${
           Math.floor(Math.random() * 50) + 100
         }k`,

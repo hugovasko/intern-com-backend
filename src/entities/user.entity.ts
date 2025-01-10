@@ -42,6 +42,9 @@ export class User {
   companyName: string;
 
   @Column({ nullable: true })
+  companyCoordinates: string;
+
+  @Column({ nullable: true })
   phoneNumber: string;
 
   @CreateDateColumn()
