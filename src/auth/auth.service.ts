@@ -72,6 +72,7 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         companyName: user.companyName,
+        companyCoordinates: user.companyCoordinates,
         phoneNumber: user.phoneNumber,
         cvFileName: user.cvFileName,
         cvMimeType: user.cvMimeType,
