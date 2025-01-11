@@ -16,4 +16,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   companyCoordinates?: string;
+
+  @IsOptional()
+  @IsString()
+  companyName?: string;
 }
