@@ -61,8 +61,9 @@ npm run seed
 
 This will create:
 
-- 5 candidate users
-- 5 partner companies with 5 opportunities each
+- 5 candidate users with realistic Bulgarian names
+- 5 major Bulgarian tech companies with their representatives
+- Multiple job opportunities per company (2-3 full-time positions and 1-2 internships)
 - 2 admin users
 
 ### Sample Users
@@ -72,17 +73,40 @@ This will create:
 1. admin1@example.com / 123456
 2. admin2@example.com / 123456
 
-#### Partners:
+#### Partners (Companies):
 
-1. partner1@company1.com / 123456
-2. partner2@company2.com / 123456
-   ... etc.
+1. Chaos Group (careers@chaosgroup.com / 123456)
+2. Progress (careers@progress.com / 123456)
+3. Telerik Academy (careers@telerikacademy.com / 123456)
+4. SoftUni (careers@softuni.bg / 123456)
+5. ScaleFocus (careers@scalefocus.com / 123456)
 
 #### Candidates:
 
-1. candidate1@example.com / 123456
-2. candidate2@example.com / 123456
-   ... etc.
+1. ivan.dimitrov@example.com / 123456
+2. maria.petrova@example.com / 123456
+3. georgi.ivanov@example.com / 123456
+4. elena.todorova@example.com / 123456
+5. stefan.angelov@example.com / 123456
+
+### Sample Job Types
+
+#### Full-time Positions:
+
+- Senior Software Engineer
+- Frontend Developer
+- DevOps Engineer
+
+#### Internships:
+
+- Junior Developer Intern
+- QA Engineering Intern
+- UI/UX Design Intern
+
+All positions include detailed descriptions, requirements, and realistic salary ranges:
+
+- Internships: 800-1300 BGN
+- Full-time positions: 3000-5000 BGN
 
 ## API Documentation
 
@@ -138,7 +162,7 @@ This will create:
   "description": "string",
   "location": "string",
   "type": "internship" | "full-time",
-  "salary": "string" (optional)
+  "salary": "number" (optional)
 }
 ```
 

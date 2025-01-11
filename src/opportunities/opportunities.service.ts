@@ -41,6 +41,7 @@ export class OpportunitiesService {
           firstName: true,
           lastName: true,
           email: true,
+          companyName: true,
         },
       },
     });
