@@ -19,7 +19,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
 import { CvUploadDto } from './dto/cv-upload.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
