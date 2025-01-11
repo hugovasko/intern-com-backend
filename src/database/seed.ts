@@ -97,9 +97,7 @@ async function bootstrap() {
           bulgarianLocations[
             Math.floor(Math.random() * bulgarianLocations.length)
           ].city,
-        salary: `${Math.floor(Math.random() * 50) + 50}k - ${
-          Math.floor(Math.random() * 50) + 100
-        }k`,
+        salary: Math.floor(Math.random() * 500) + 1000,
         type: Math.random() > 0.5 ? 'internship' : 'full-time',
         company: partner,
       });

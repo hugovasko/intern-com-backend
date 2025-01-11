@@ -23,7 +23,7 @@ export class Opportunity {
   location: string;
 
   @Column({ nullable: true })
-  salary: string;
+  salary: number;
 
   @Column()
   type: string; // e.g., 'internship', 'full-time', etc.

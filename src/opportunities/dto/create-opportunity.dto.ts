@@ -15,8 +15,8 @@ export class CreateOpportunityDto {
   location: string;
 
   @IsOptional()
-  @IsString()
-  salary?: string;
+  @IsNumber()
+  salary?: number;
 
   @IsNotEmpty()
   @IsString()
