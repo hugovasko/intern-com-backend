@@ -48,6 +48,16 @@ async function bootstrap() {
     { city: 'Ruse', coordinates: '43.856258,25.974375' },
   ];
 
+  function generateBulgarianPhoneNumber(): string {
+    const prefix = '088';
+
+    const randomDigits = Array.from({ length: 7 }, () =>
+      Math.floor(Math.random() * 10),
+    ).join('');
+
+    return prefix + randomDigits;
+  }
+
   // Create partner users
   const partners = [];
   for (let i = 1; i <= 5; i++) {
@@ -60,6 +70,7 @@ async function bootstrap() {
         role: UserRole.PARTNER,
         companyName: `Company ${i}`,
         companyCoordinates: bulgarianLocations[i - 1].coordinates,
+        phoneNumber: generateBulgarianPhoneNumber(),
       }),
     );
   }
@@ -72,6 +83,7 @@ async function bootstrap() {
       email: `candidate${i}@example.com`,
       password: hashedPassword,
       role: UserRole.CANDIDATE,
+      phoneNumber: generateBulgarianPhoneNumber(),
     });
   }
 

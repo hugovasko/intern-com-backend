@@ -48,7 +48,13 @@ export class UsersService {
   async getAllPartnersCoordinates() {
     return this.userRepository.find({
       where: { role: UserRole.PARTNER },
-      select: ['id', 'companyName', 'companyCoordinates'],
+      select: [
+        'id',
+        'companyName',
+        'companyCoordinates',
+        'email',
+        'phoneNumber',
+      ],
     });
   }
 
