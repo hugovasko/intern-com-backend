@@ -5,8 +5,10 @@ import {
   Column,
   CreateDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Application } from './application.entity';
 
 @Entity('opportunities')
 export class Opportunity {
@@ -33,4 +35,7 @@ export class Opportunity {
 
   @ManyToOne(() => User, (user) => user.opportunities)
   company: User;
+
+  @OneToMany(() => Application, (application) => application.opportunity)
+  applications: Application[];
 }

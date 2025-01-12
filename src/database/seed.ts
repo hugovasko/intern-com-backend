@@ -5,6 +5,7 @@ import { Opportunity } from '../entities/opportunity.entity';
 import { Repository } from 'typeorm';
 import { UserRole } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { Application } from 'src/entities/application.entity';
 
 // Real Bulgarian companies data
 const bulgarianCompanies = [
@@ -184,10 +185,19 @@ async function bootstrap() {
   const opportunityRepository = app.get(
     'OpportunityRepository',
   ) as Repository<Opportunity>;
+  const applicationRepository = app.get(
+    'ApplicationRepository',
+  ) as Repository<Application>;
 
   // Clear existing data
-  await opportunityRepository.delete({});
-  await userRepository.delete({});
+  try {
+    await applicationRepository.delete({});
+    await opportunityRepository.delete({});
+    await userRepository.delete({});
+  } catch (error) {
+    console.error('Error clearing existing data: ', error);
+    throw error;
+  }
 
   // Hash the password for all users
   const hashedPassword = await bcrypt.hash('123456', 10);

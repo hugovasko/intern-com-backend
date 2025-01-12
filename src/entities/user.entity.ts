@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Opportunity } from './opportunity.entity';
+import { Application } from './application.entity';
 
 export enum UserRole {
   CANDIDATE = 'candidate',
@@ -64,4 +65,7 @@ export class User {
 
   @Column({ nullable: true })
   cvUploadedAt: Date;
+
+  @OneToMany(() => Application, (application) => application.candidate)
+  applications: Application[];
 }

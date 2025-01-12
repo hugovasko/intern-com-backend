@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User, UserRole } from '../entities/user.entity';
 import { CvUploadDto } from './dto/cv-upload.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -29,6 +29,7 @@ export class UsersService {
           'companyName',
           'role',
           'createdAt',
+          'phoneNumber',
         ],
       });
     }
@@ -41,6 +42,7 @@ export class UsersService {
         'companyName',
         'role',
         'createdAt',
+        'phoneNumber',
       ],
     });
   }
@@ -133,12 +135,62 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['opportunities', 'applications'],
+    });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    return this.userRepository.remove(user);
+    // Use QueryRunner to ensure all operations are in a single transaction
+    const queryRunner =
+      this.userRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // If it's a partner, first delete all opportunities and applications
+      if (user.role === UserRole.PARTNER) {
+        // Delete all applications for this partner's opportunities
+        if (user.opportunities) {
+          const opportunityIds = user.opportunities.map((opp) => opp.id);
+          if (opportunityIds.length > 0) {
+            await queryRunner.manager.delete('applications', {
+              opportunity: { id: In(opportunityIds) },
+            });
+          }
+        }
+
+        // Delete all opportunities
+        await queryRunner.manager.delete('opportunities', {
+          company: { id: user.id },
+        });
+      }
+
+      // If it's a candidate, delete their applications
+      if (user.role === UserRole.CANDIDATE) {
+        await queryRunner.manager.delete('applications', {
+          candidate: { id: user.id },
+        });
+      }
+
+      // Finally delete the user
+      await queryRunner.manager.remove(user);
+
+      // Commit the transaction
+      await queryRunner.commitTransaction();
+
+      return user;
+    } catch (error) {
+      // If there's an error, rollback the changes
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      // Release the query runner
+      await queryRunner.release();
+    }
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
