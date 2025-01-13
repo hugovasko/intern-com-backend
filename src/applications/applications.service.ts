@@ -75,6 +75,7 @@ export class ApplicationsService {
           firstName: true,
           lastName: true,
           email: true,
+          cvFileName: true,
         },
         opportunity: {
           id: true,
@@ -98,6 +99,7 @@ export class ApplicationsService {
           firstName: true,
           lastName: true,
           email: true,
+          cvFileName: true,
         },
         opportunity: {
           id: true,
@@ -144,6 +146,7 @@ export class ApplicationsService {
           firstName: true,
           lastName: true,
           email: true,
+          cvFileName: true,
         },
       },
     });
