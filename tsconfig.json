@@ -16,6 +16,13 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "moduleResolution": "node",
+    "typeRoots": ["node_modules/@types"],
+    "esModuleInterop": true,
+    "paths": {
+      "@octokit/rest": ["node_modules/@octokit/rest"]
+    }
   }
 }
+

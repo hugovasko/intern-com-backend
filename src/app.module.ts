@@ -9,6 +9,8 @@ import { Application } from './entities/application.entity';
 import { OpportunitiesModule } from './opportunities/opportunities.module';
 import { UsersModule } from './users/users.module';
 import { ApplicationsModule } from './applications/applications.module';
+import { GithubModule } from './github/github.module';
+
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { ApplicationsModule } from './applications/applications.module';
     OpportunitiesModule,
     UsersModule,
     ApplicationsModule,
+    GithubModule
   ],
 })
 export class AppModule {}
