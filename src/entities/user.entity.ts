@@ -68,4 +68,16 @@ export class User {
 
   @OneToMany(() => Application, (application) => application.candidate)
   applications: Application[];
+
+  @Column({ nullable: true })
+  stripeCustomerId: string;
+
+  @Column({ nullable: true })
+  subscriptionId: string;
+
+  @Column({ nullable: true })
+  subscriptionStatus: string; // 'active', 'inactive', 'past_due', etc.
+
+  @Column({ nullable: true, type: 'timestamp' })
+  subscriptionEndDate: Date;
 }

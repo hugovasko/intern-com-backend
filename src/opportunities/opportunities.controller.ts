@@ -83,7 +83,12 @@ export class OpportunitiesController {
       );
     }
 
-    return this.opportunitiesService.update(+id, updateOpportunityDto);
+    return this.opportunitiesService.update(
+      +id,
+      updateOpportunityDto,
+      req.user.id,
+      req.user.role === UserRole.ADMIN,
+    );
   }
 
   @Delete(':id')

@@ -222,6 +222,12 @@ export class UsersService {
     // Remove sensitive data before returning
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, cv, ...result } = user;
-    return result;
+    return {
+      ...result,
+      subscriptionStatus: user.subscriptionStatus,
+      stripeCustomerId: user.stripeCustomerId,
+      subscriptionId: user.subscriptionId,
+      subscriptionEndDate: user.subscriptionEndDate,
+    };
   }
 }

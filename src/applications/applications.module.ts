@@ -5,10 +5,11 @@ import { ApplicationsController } from './applications.controller';
 import { Application } from '../entities/application.entity';
 import { User } from '../entities/user.entity';
 import { Opportunity } from '../entities/opportunity.entity';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Application, User, Opportunity])],
   controllers: [ApplicationsController],
-  providers: [ApplicationsService],
+  providers: [ApplicationsService, SubscriptionsService],
 })
 export class ApplicationsModule {}

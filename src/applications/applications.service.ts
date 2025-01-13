@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,6 +11,7 @@ import { User, UserRole } from '../entities/user.entity';
 import { Opportunity } from '../entities/opportunity.entity';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 
 @Injectable()
 export class ApplicationsService {
@@ -20,6 +22,7 @@ export class ApplicationsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Opportunity)
     private readonly opportunityRepository: Repository<Opportunity>,
+    private readonly subscriptionsService: SubscriptionsService,
   ) {}
 
   async create(
@@ -37,9 +40,21 @@ export class ApplicationsService {
     // Check if opportunity exists
     const opportunity = await this.opportunityRepository.findOne({
       where: { id: createApplicationDto.opportunityId },
+      relations: ['company'],
     });
     if (!opportunity) {
       throw new NotFoundException('Opportunity not found');
+    }
+
+    // Check if company has active subscription
+    const hasActiveSubscription =
+      await this.subscriptionsService.hasActiveSubscription(
+        opportunity.company.id,
+      );
+    if (!hasActiveSubscription) {
+      throw new BadRequestException(
+        'This opportunity is not currently available',
+      );
     }
 
     // Check if application already exists
@@ -153,6 +168,15 @@ export class ApplicationsService {
   }
 
   async findByCompany(companyId: number) {
+    // Check if company has active subscription
+    const hasActiveSubscription =
+      await this.subscriptionsService.hasActiveSubscription(companyId);
+    if (!hasActiveSubscription) {
+      throw new ForbiddenException(
+        'Active subscription required to view applications',
+      );
+    }
+
     return this.applicationRepository
       .createQueryBuilder('application')
       .leftJoinAndSelect('application.candidate', 'candidate')

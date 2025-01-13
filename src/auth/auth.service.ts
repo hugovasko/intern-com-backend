@@ -76,6 +76,10 @@ export class AuthService {
         phoneNumber: user.phoneNumber,
         cvFileName: user.cvFileName,
         cvMimeType: user.cvMimeType,
+        subscriptionStatus: user.subscriptionStatus,
+        stripeCustomerId: user.stripeCustomerId,
+        subscriptionId: user.subscriptionId,
+        subscriptionEndDate: user.subscriptionEndDate,
       },
     };
   }

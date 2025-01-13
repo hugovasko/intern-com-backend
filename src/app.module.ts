@@ -1,5 +1,5 @@
 // src/app.module.ts
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
@@ -9,6 +9,8 @@ import { Application } from './entities/application.entity';
 import { OpportunitiesModule } from './opportunities/opportunities.module';
 import { UsersModule } from './users/users.module';
 import { ApplicationsModule } from './applications/applications.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { StripeWebhookMiddleware } from './middlewares/stripe-webhook.middleware';
 
 @Module({
   imports: [
@@ -34,6 +36,11 @@ import { ApplicationsModule } from './applications/applications.module';
     OpportunitiesModule,
     UsersModule,
     ApplicationsModule,
+    SubscriptionsModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(StripeWebhookMiddleware).forRoutes('subscriptions/webhook');
+  }
+}
