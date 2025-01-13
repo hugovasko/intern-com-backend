@@ -161,6 +161,7 @@ export class ApplicationsService {
         'candidate.firstName',
         'candidate.lastName',
         'candidate.email',
+        'candidate.cvFileName',
         'opportunity.id',
         'opportunity.title',
       ])
@@ -178,5 +179,19 @@ export class ApplicationsService {
   async remove(id: number) {
     const application = await this.findOne(id);
     await this.applicationRepository.remove(application);
+  }
+
+  async hasApplicationForCompany(
+    candidateId: number,
+    companyId: number,
+  ): Promise<boolean> {
+    const application = await this.applicationRepository
+      .createQueryBuilder('application')
+      .innerJoin('application.opportunity', 'opportunity')
+      .where('application.candidateId = :candidateId', { candidateId })
+      .andWhere('opportunity.companyId = :companyId', { companyId })
+      .getOne();
+
+    return !!application;
   }
 }

@@ -20,11 +20,15 @@ import { UserRole } from '../entities/user.entity';
 import { CvUploadDto } from './dto/cv-upload.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from '../auth/decorators/public.decorator';
+import { ApplicationsService } from '../applications/applications.service';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly applicationsService: ApplicationsService,
+  ) {}
 
   @UseGuards(RoleGuard)
   @Roles(UserRole.ADMIN)
@@ -82,10 +86,31 @@ export class UsersController {
 
   @Get(':id/cv')
   async downloadCv(@Req() req, @Param('id') id: string) {
-    if (req.user.id !== +id && req.user.role !== UserRole.ADMIN) {
-      throw new ForbiddenException('You can only download your own CV');
+    const userId = +id;
+    const requestingUser = req.user;
+
+    if (
+      requestingUser.id === userId ||
+      requestingUser.role === UserRole.ADMIN
+    ) {
+      return this.usersService.downloadCv(userId);
     }
-    return this.usersService.downloadCv(+id);
+
+    if (requestingUser.role === UserRole.PARTNER) {
+      const hasApplication =
+        await this.applicationsService.hasApplicationForCompany(
+          userId,
+          requestingUser.id,
+        );
+
+      if (hasApplication) {
+        return this.usersService.downloadCv(userId);
+      }
+    }
+
+    throw new ForbiddenException(
+      'You do not have permission to download this CV',
+    );
   }
 
   @Delete(':id/cv')
