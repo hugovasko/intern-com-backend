@@ -8,6 +8,7 @@ import {
   Delete,
   Body,
   Req,
+  Get,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -18,6 +19,13 @@ import { SubscriptionsService } from './subscriptions.service';
 @Controller('subscriptions')
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
+
+  @Get('status')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.PARTNER)
+  async getSubscriptionStatus(@Request() req) {
+    return this.subscriptionsService.hasActiveSubscription(req.user.id);
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard, RoleGuard)

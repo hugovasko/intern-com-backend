@@ -49,7 +49,7 @@ export class UsersService {
 
   async getAllPartnersCoordinates() {
     return this.userRepository.find({
-      where: { role: UserRole.PARTNER },
+      where: { role: UserRole.PARTNER, subscriptionStatus: 'active' },
       select: [
         'id',
         'companyName',
