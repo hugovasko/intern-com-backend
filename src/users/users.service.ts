@@ -17,23 +17,6 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findByGitHubId(githubId: string): Promise<User | null> {
-    if (!githubId) {
-      return null; 
-    }
-    return this.userRepository.findOne({ where: { githubId } });
-  }
-
-  async createUser(githubId: string, username: string, email: string): Promise<User> {
-    const newUser = new User(); 
-    newUser.githubId = githubId;
-    newUser.email = email;
-    newUser.role = UserRole.CANDIDATE; 
-  
-    return this.userRepository.save(newUser);
-  }
-  
-
   async findAll(role?: UserRole) {
     if (role) {
       return this.userRepository.find({
@@ -240,5 +223,19 @@ export class UsersService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, cv, ...result } = user;
     return result;
+  }
+
+
+  async findByGitHubId(githubId: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { githubId } });
+  }
+  
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { email } });
+  }
+  
+  async createUser(data: { githubId?: string;email: string; password: string | null; role: UserRole }): Promise<User> {
+    const newUser = this.userRepository.create(data);
+    return this.userRepository.save(newUser);
   }
 }

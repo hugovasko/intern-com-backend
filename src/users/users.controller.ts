@@ -11,6 +11,7 @@ import {
   Query,
   ForbiddenException,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -21,6 +22,7 @@ import { CvUploadDto } from './dto/cv-upload.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { ApplicationsService } from '../applications/applications.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -28,6 +30,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly applicationsService: ApplicationsService,
+    private readonly authService: AuthService,
   ) {}
 
   @UseGuards(RoleGuard)
@@ -126,4 +129,14 @@ export class UsersController {
   getAllPartnersCoordinates() {
     return this.usersService.getAllPartnersCoordinates();
   }
+
+  @Post('auth/github')
+  async githubLogin(@Body('code') code: string) {
+    if (!code) {
+      throw new BadRequestException('GitHub OAuth code is required');
+    }
+
+    return this.authService.handleGitHubLogin(code);
+  }
 }
+

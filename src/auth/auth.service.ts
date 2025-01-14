@@ -23,85 +23,128 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async handleGitHubLogin(githubId: string, username: string, email: string) {
-    // Check if the user already exists
-    const existingUser = await this.usersService.findByGitHubId(githubId);
-  
-    if (existingUser) {
-      const payload = { sub: existingUser.id, role: existingUser.role };
-      const accessToken = this.jwtService.sign(payload);
-      return { accessToken, user: existingUser };
+  // GitHub API URL and client details
+  private githubTokenUrl = 'https://github.com/login/oauth/access_token';
+  private githubUserUrl = 'https://api.github.com/user';
+  private clientId = process.env.GITHUB_CLIENT_ID;
+  private clientSecret = process.env.GITHUB_CLIENT_SECRET;
+
+  // Exchange GitHub OAuth code for an access token
+  private async getGitHubAccessToken(code: string): Promise<string> {
+    try {
+      const response = await axios.post(
+        this.githubTokenUrl,
+        {
+          client_id: this.clientId,
+          client_secret: this.clientSecret,
+          code,
+        },
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+        },
+      );
+
+      if (response.data.error) {
+        throw new UnauthorizedException('Failed to exchange GitHub code for access token');
+      }
+
+      return response.data.access_token;
+    } catch (error) {
+      throw new UnauthorizedException('GitHub token exchange failed');
     }
-  
-    // Create a new user if one doesn't exist
-    const newUser = await this.usersService.createUser(
-      githubId,
-      username,
-      email,
-    );
-  
-    const payload = { sub: newUser.id, role: newUser.role };
-    const accessToken = this.jwtService.sign(payload);
-    return { accessToken, user: newUser };
   }
 
-  async register(registerDto: RegisterDto) {
-    const existingUser = await this.usersService.findByGitHubId(githubId);
-      where: { email: registerDto.email },
-    });
+  // Fetch user details from GitHub using the access token
+  private async getGitHubUser(accessToken: string) {
+    try {
+      const response = await axios.get(this.githubUserUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-    if (existingUser) {
-      throw new ConflictException('Email already exists');
+      return response.data;
+    } catch (error) {
+      throw new UnauthorizedException('Failed to fetch GitHub user details');
     }
-
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-
-    // Create user with all possible fields
-    const newUser = await this.usersService.createUser(githubId, username, email);
-      ...registerDto,
-      password: hashedPassword,
-      role: registerDto.role || UserRole.CANDIDATE, // Default to CANDIDATE if not specified
-    });
-
-    await this.userRepository.save(user);
-
-    // Remove password from response
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user;
-    return result;
   }
 
-  async login(loginDto: LoginDto) {
-    const user = await this.userRepository.findOne({
-      where: { email: loginDto.email },
-    });
+  // Handle GitHub login
+  async handleGitHubLogin(code: string) {
+    // Step 1: Exchange code for access token
+    const accessToken = await this.getGitHubAccessToken(code);
+
+    // Step 2: Fetch GitHub user details
+    const { id: githubId, login: username, email } = await this.getGitHubUser(accessToken);
+
+    // Step 3: Find or create user in the database
+    let user = await this.usersService.findByGitHubId(githubId);
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      // If the user does not exist, create a new user
+      user = await this.usersService.createUser({
+        githubId,
+        email,
+        password: null, // GitHub users do not have passwords
+        role: UserRole.CANDIDATE,
+      });
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      loginDto.password,
-      user.password,
-    );
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    // Step 4: Generate JWT token
+    const payload = { sub: user.id, role: user.role };
+    const accessTokenJwt = this.jwtService.sign(payload);
 
-    return {
-      access_token: this.jwtService.sign({ sub: user.id, email: user.email, role: user.role }),
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        companyName: user.companyName,
-        companyCoordinates: user.companyCoordinates,
-        phoneNumber: user.phoneNumber,
-        cvFileName: user.cvFileName,
-        cvMimeType: user.cvMimeType,
-      },
-    };  
+    return { accessToken: accessTokenJwt, user };
+  }
+
+    // Register a new user
+    async register(registerDto: RegisterDto) {
+      const { email, password } = registerDto;
+  
+      // Check if a user with this email already exists
+      const existingUser = await this.usersService.findByEmail(email);
+      if (existingUser) {
+        throw new ConflictException('Email already exists');
+      }
+  
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Create a new user
+      const newUser = await this.usersService.createUser({
+        email,
+        password: hashedPassword,
+        role: UserRole.CANDIDATE, // Default to CANDIDATE for registered users
+      });
+  
+      // Remove sensitive data before returning
+      const { password: _, ...result } = newUser;
+      return result;
+    }
+  
+    // Log in an existing user
+    async login(loginDto: LoginDto) {
+      const { email, password } = loginDto;
+  
+      // Find user by email
+      const user = await this.usersService.findByEmail(email);
+      if (!user) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+  
+      // Check the password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+  
+      // Generate JWT token
+      const payload = { sub: user.id, role: user.role };
+      const accessToken = this.jwtService.sign(payload);
+  
+      return { accessToken, user };
   }
 }
+  
