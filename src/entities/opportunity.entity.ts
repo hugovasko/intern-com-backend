@@ -1,4 +1,3 @@
-// src/entities/opportunity.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -28,7 +27,7 @@ export class Opportunity {
   salary: number;
 
   @Column()
-  type: string; // e.g., 'internship', 'full-time', etc.
+  type: string;
 
   @CreateDateColumn()
   createdAt: Date;

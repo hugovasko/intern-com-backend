@@ -1,4 +1,3 @@
-// src/entities/user.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -76,7 +75,7 @@ export class User {
   subscriptionId: string;
 
   @Column({ nullable: true })
-  subscriptionStatus: string; // 'active', 'inactive', 'past_due', etc.
+  subscriptionStatus: string;
 
   @Column({ nullable: true, type: 'timestamp' })
   subscriptionEndDate: Date;

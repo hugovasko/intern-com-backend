@@ -1,4 +1,3 @@
-// src/opportunities/dto/create-opportunity.dto.ts
 import { IsNotEmpty, IsString, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateOpportunityDto {

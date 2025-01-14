@@ -1,4 +1,3 @@
-// src/subscriptions/subscriptions.controller.ts
 import {
   Controller,
   Post,

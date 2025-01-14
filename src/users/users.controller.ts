@@ -1,4 +1,3 @@
-// src/users/users.controller.ts
 import {
   Controller,
   Get,
@@ -51,7 +50,6 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  // User profile management routes
   @Get('me')
   async getCurrentUser(@Req() req) {
     return this.usersService.findOne(req.user.id);
@@ -63,7 +61,6 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    // Allow if user is updating their own profile or is an admin
     if (req.user.id !== +id && req.user.role !== UserRole.ADMIN) {
       throw new ForbiddenException('You can only update your own profile');
     }

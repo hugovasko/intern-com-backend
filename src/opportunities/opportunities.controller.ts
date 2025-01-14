@@ -1,4 +1,3 @@
-// src/opportunities/opportunities.controller.ts
 import {
   Controller,
   Get,

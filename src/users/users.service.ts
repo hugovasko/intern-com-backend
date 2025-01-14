@@ -1,4 +1,3 @@
-// src/users/users.service.ts
 import {
   BadRequestException,
   Injectable,
@@ -109,16 +108,13 @@ export class UsersService {
       throw new NotFoundException('User does not have a CV');
     }
 
-    // Clear CV-related fields
     user.cv = null;
     user.cvFileName = null;
     user.cvMimeType = null;
     user.cvUploadedAt = null;
 
-    // Save and return the updated user
     const savedUser = await this.userRepository.save(user);
 
-    // Remove sensitive data before returning
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = savedUser;
     return result;
@@ -144,16 +140,13 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Use QueryRunner to ensure all operations are in a single transaction
     const queryRunner =
       this.userRepository.manager.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // If it's a partner, first delete all opportunities and applications
       if (user.role === UserRole.PARTNER) {
-        // Delete all applications for this partner's opportunities
         if (user.opportunities) {
           const opportunityIds = user.opportunities.map((opp) => opp.id);
           if (opportunityIds.length > 0) {
@@ -163,32 +156,26 @@ export class UsersService {
           }
         }
 
-        // Delete all opportunities
         await queryRunner.manager.delete('opportunities', {
           company: { id: user.id },
         });
       }
 
-      // If it's a candidate, delete their applications
       if (user.role === UserRole.CANDIDATE) {
         await queryRunner.manager.delete('applications', {
           candidate: { id: user.id },
         });
       }
 
-      // Finally delete the user
       await queryRunner.manager.remove(user);
 
-      // Commit the transaction
       await queryRunner.commitTransaction();
 
       return user;
     } catch (error) {
-      // If there's an error, rollback the changes
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
-      // Release the query runner
       await queryRunner.release();
     }
   }
@@ -200,13 +187,10 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Update only the provided fields
     Object.assign(user, updateUserDto);
 
-    // Save and return the updated user
     const savedUser = await this.userRepository.save(user);
 
-    // Remove sensitive data before returning
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, cv, ...result } = savedUser;
     return result;
@@ -219,7 +203,6 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Remove sensitive data before returning
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, cv, ...result } = user;
     return {

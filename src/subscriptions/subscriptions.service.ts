@@ -1,4 +1,3 @@
-// src/subscriptions/subscriptions.service.ts
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -27,7 +26,6 @@ export class SubscriptionsService {
     }
 
     try {
-      // Create or get Stripe customer
       let customerId = user.stripeCustomerId;
       if (!customerId) {
         const customer = await this.stripe.customers.create({
@@ -41,7 +39,6 @@ export class SubscriptionsService {
         await this.userRepository.save(user);
       }
 
-      // Cancel any existing incomplete subscriptions
       const existingSubscriptions = await this.stripe.subscriptions.list({
         customer: customerId,
         status: 'incomplete',
@@ -51,7 +48,6 @@ export class SubscriptionsService {
         await this.stripe.subscriptions.cancel(subscription.id);
       }
 
-      // Create new subscription
       const subscription = await this.stripe.subscriptions.create({
         customer: customerId,
         items: [{ price: this.configService.get('STRIPE_PRICE_ID') }],
@@ -63,7 +59,6 @@ export class SubscriptionsService {
         },
       });
 
-      // Update user subscription info
       user.subscriptionId = subscription.id;
       user.subscriptionStatus = subscription.status;
       await this.userRepository.save(user);

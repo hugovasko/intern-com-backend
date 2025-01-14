@@ -1,4 +1,3 @@
-// src/auth/guards/subscription.guard.ts
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { SubscriptionsService } from '../../subscriptions/subscriptions.service';
 import { UserRole } from '../../entities/user.entity';

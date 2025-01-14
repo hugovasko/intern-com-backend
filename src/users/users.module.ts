@@ -1,4 +1,3 @@
-// src/users/users.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './users.controller';
@@ -13,6 +12,6 @@ import { SubscriptionsService } from '../subscriptions/subscriptions.service';
   imports: [TypeOrmModule.forFeature([User, Application, Opportunity])],
   controllers: [UsersController],
   providers: [UsersService, ApplicationsService, SubscriptionsService],
-  exports: [UsersService], // Export if other modules need to use the service
+  exports: [UsersService],
 })
 export class UsersModule {}

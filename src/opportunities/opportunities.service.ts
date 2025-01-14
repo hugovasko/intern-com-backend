@@ -1,4 +1,3 @@
-// src/opportunities/opportunities.service.ts
 import {
   ForbiddenException,
   Injectable,

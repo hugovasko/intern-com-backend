@@ -7,7 +7,6 @@ import { UserRole } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { Application } from 'src/entities/application.entity';
 
-// Real Bulgarian companies data
 const bulgarianCompanies = [
   {
     name: 'Chaos Group',
@@ -41,7 +40,6 @@ const bulgarianCompanies = [
   },
 ];
 
-// Real Bulgarian candidate names
 const bulgarianCandidates = [
   { firstName: 'Ivan', lastName: 'Dimitrov' },
   { firstName: 'Maria', lastName: 'Petrova' },
@@ -50,7 +48,6 @@ const bulgarianCandidates = [
   { firstName: 'Stefan', lastName: 'Angelov' },
 ];
 
-// Bulgarian cities with coordinates
 const bulgarianLocations = [
   { city: 'Sofia', coordinates: '42.697839,23.321670' },
   { city: 'Plovdiv', coordinates: '42.144920,24.748220' },
@@ -59,7 +56,6 @@ const bulgarianLocations = [
   { city: 'Ruse', coordinates: '43.856258,25.974375' },
 ];
 
-// Job descriptions and requirements by type
 const jobTemplates = {
   'full-time': [
     {
@@ -189,7 +185,6 @@ async function bootstrap() {
     'ApplicationRepository',
   ) as Repository<Application>;
 
-  // Clear existing data
   try {
     await applicationRepository.delete({});
     await opportunityRepository.delete({});
@@ -199,10 +194,8 @@ async function bootstrap() {
     throw error;
   }
 
-  // Hash the password for all users
   const hashedPassword = await bcrypt.hash('123456', 10);
 
-  // Create admin users
   await userRepository.save({
     firstName: 'Admin',
     lastName: 'One',
@@ -219,7 +212,6 @@ async function bootstrap() {
     role: UserRole.ADMIN,
   });
 
-  // Create partner users
   const partners = [];
   for (const company of bulgarianCompanies) {
     partners.push(
@@ -236,7 +228,6 @@ async function bootstrap() {
     );
   }
 
-  // Create candidate users
   for (const candidate of bulgarianCandidates) {
     const email = `${candidate.firstName.toLowerCase()}.${candidate.lastName.toLowerCase()}@example.com`;
     await userRepository.save({
@@ -249,9 +240,7 @@ async function bootstrap() {
     });
   }
 
-  // Create opportunities for each partner
   for (const partner of partners) {
-    // Create 2-3 full-time positions
     const fullTimeCount = Math.floor(Math.random() * 2) + 2;
     for (let i = 0; i < fullTimeCount; i++) {
       const template =
@@ -271,7 +260,6 @@ async function bootstrap() {
       });
     }
 
-    // Create 1-2 internships
     const internshipCount = Math.floor(Math.random() * 2) + 1;
     for (let i = 0; i < internshipCount; i++) {
       const template =

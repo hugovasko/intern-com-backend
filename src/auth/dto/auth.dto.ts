@@ -1,4 +1,3 @@
-// src/auth/dto/auth.dto.ts
 import {
   IsEmail,
   IsString,

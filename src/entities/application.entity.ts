@@ -1,4 +1,3 @@
-// src/entities/application.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -18,7 +17,7 @@ export enum ApplicationStatus {
 }
 
 @Entity('applications')
-@Unique(['candidate', 'opportunity']) // Prevent duplicate applications
+@Unique(['candidate', 'opportunity'])
 export class Application {
   @PrimaryGeneratedColumn()
   id: number;
@@ -48,8 +47,8 @@ export class Application {
   createdAt: Date;
 
   @Column({ nullable: true })
-  message?: string; // Optional message from candidate
+  message?: string;
 
   @Column({ nullable: true })
-  note?: string; // Optional internal note for company/admin
+  note?: string;
 }
