@@ -3,6 +3,8 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,17 +12,41 @@ import { Repository } from 'typeorm';
 import { User, UserRole } from '../entities/user.entity';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
+import { UsersService } from 'src/users/users.service';
+import axios from 'axios';
+
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
+  async handleGitHubLogin(githubId: string, username: string, email: string) {
+    // Check if the user already exists
+    const existingUser = await this.usersService.findByGitHubId(githubId);
+  
+    if (existingUser) {
+      const payload = { sub: existingUser.id, role: existingUser.role };
+      const accessToken = this.jwtService.sign(payload);
+      return { accessToken, user: existingUser };
+    }
+  
+    // Create a new user if one doesn't exist
+    const newUser = await this.usersService.createUser(
+      githubId,
+      username,
+      email,
+    );
+  
+    const payload = { sub: newUser.id, role: newUser.role };
+    const accessToken = this.jwtService.sign(payload);
+    return { accessToken, user: newUser };
+  }
+
   async register(registerDto: RegisterDto) {
-    const existingUser = await this.userRepository.findOne({
+    const existingUser = await this.usersService.findByGitHubId(githubId);
       where: { email: registerDto.email },
     });
 
@@ -31,7 +57,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
     // Create user with all possible fields
-    const user = this.userRepository.create({
+    const newUser = await this.usersService.createUser(githubId, username, email);
       ...registerDto,
       password: hashedPassword,
       role: registerDto.role || UserRole.CANDIDATE, // Default to CANDIDATE if not specified
@@ -62,9 +88,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign({ sub: user.id, email: user.email, role: user.role }),
       user: {
         id: user.id,
         email: user.email,
@@ -77,6 +102,6 @@ export class AuthService {
         cvFileName: user.cvFileName,
         cvMimeType: user.cvMimeType,
       },
-    };
+    };  
   }
 }

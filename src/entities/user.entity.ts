@@ -32,6 +32,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ unique: true, nullable: true })
+  githubId: string;
+
   @Column({
     type: 'enum',
     enum: UserRole,

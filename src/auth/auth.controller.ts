@@ -16,4 +16,10 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
+
+  @Post('github/callback')
+  async handleGitHubCallback(@Body('code') code: string) {
+    const { accessToken, user } = await this.authService.handleGitHubLogin(code);
+    return { accessToken, user };
+  }
 }

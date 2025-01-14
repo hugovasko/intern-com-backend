@@ -17,6 +17,23 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  async findByGitHubId(githubId: string): Promise<User | null> {
+    if (!githubId) {
+      return null; 
+    }
+    return this.userRepository.findOne({ where: { githubId } });
+  }
+
+  async createUser(githubId: string, username: string, email: string): Promise<User> {
+    const newUser = new User(); 
+    newUser.githubId = githubId;
+    newUser.email = email;
+    newUser.role = UserRole.CANDIDATE; 
+  
+    return this.userRepository.save(newUser);
+  }
+  
+
   async findAll(role?: UserRole) {
     if (role) {
       return this.userRepository.find({
